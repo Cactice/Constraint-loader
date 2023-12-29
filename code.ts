@@ -33,8 +33,30 @@ const yMapper: Record<
   SCALE: () => "Scale",
 } as const;
 
+const recurseChildren = <T>(
+  parent: SceneNode,
+  func: (child: SceneNode) => Record<string, T>
+): Record<string, T> => {
+  if ("children" in parent) {
+    return parent.children.reduce((acc, child) => {
+      return { ...acc, ...func(child), ...recurseChildren(child, func) };
+    }, {});
+  }
+  return {};
+};
+
 const attributeGetter = (component: SceneNode) => {
-  const constraints = "constraints" in component && component.constraints;
+  let constraints = "constraints" in component && component.constraints;
+  const childConstraints = recurseChildren(component, (child) => {
+    if (!("constraints" in child)) {
+      return {};
+    }
+    constraints = child.constraints;
+    return {
+      [child.name]: constraints,
+    };
+  });
+
   const bbox =
     "absoluteBoundingBox" in component && component.absoluteBoundingBox;
   const parentBbox =
@@ -49,20 +71,9 @@ const attributeGetter = (component: SceneNode) => {
     };
     return { [component.name]: json };
   } else {
+    console.log(component.name, constraints, bbox, parentBbox);
     return {};
   }
-};
-
-const recurseChildren = (
-  parent: SceneNode,
-  func: (child: SceneNode) => Record<string, { x: unknown; y: unknown }>
-): Record<string, { x: unknown; y: unknown }> => {
-  if ("children" in parent) {
-    return parent.children.reduce((acc, child) => {
-      return { ...acc, ...func(child), ...recurseChildren(child, func) };
-    }, {});
-  }
-  return {};
 };
 
 if (figma.editorType === "figma") {
