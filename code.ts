@@ -3,7 +3,9 @@ const xMapper: Record<
   ({ bbox, parentBbox }: { bbox: Rect; parentBbox: Rect }) => unknown
 > = {
   MIN: ({ bbox, parentBbox }) => ({ Left: bbox.x - parentBbox.x }),
-  CENTER: ({ bbox, parentBbox }) => ({ Center: bbox.x - parentBbox.x }),
+  CENTER: ({ bbox, parentBbox }) => ({
+    Center: bbox.x + bbox.width / 2 - (parentBbox.x + parentBbox.width / 2),
+  }),
   MAX: ({ bbox, parentBbox }) => ({
     Right: bbox.x + bbox.width - (parentBbox.x + parentBbox.width),
   }),
@@ -20,7 +22,9 @@ const yMapper: Record<
   ({ bbox, parentBbox }: { bbox: Rect; parentBbox: Rect }) => unknown
 > = {
   MIN: ({ bbox, parentBbox }) => ({ Top: bbox.y - parentBbox.y }),
-  CENTER: ({ bbox, parentBbox }) => ({ Center: bbox.y - parentBbox.y }),
+  CENTER: ({ bbox, parentBbox }) => ({
+    Center: bbox.y + bbox.height / 2 - (parentBbox.y + parentBbox.height / 2),
+  }),
   MAX: ({ bbox, parentBbox }) => ({
     Bottom: bbox.y + bbox.height - (parentBbox.y + parentBbox.height),
   }),
@@ -39,7 +43,12 @@ const recurseChildren = <T>(
 ): Record<string, T> => {
   if ("children" in parent) {
     return parent.children.reduce((acc, child) => {
-      return { ...acc, ...func(child), ...recurseChildren(child, func) };
+      return {
+        ...acc,
+        ...func(child),
+        ...func(parent),
+        ...recurseChildren(child, func),
+      };
     }, {});
   }
   return {};
