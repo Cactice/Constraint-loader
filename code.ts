@@ -25,9 +25,9 @@ const yMapper: Record<
     Bottom: bbox.y + bbox.height - (parentBbox.y + parentBbox.height),
   }),
   STRETCH: ({ bbox, parentBbox }) => ({
-    LeftAndRight: {
-      left: bbox.y - parentBbox.y,
-      right: bbox.y + bbox.height - (parentBbox.y + parentBbox.height),
+    TopAndBottom: {
+      top: bbox.y - parentBbox.y,
+      bottom: bbox.y + bbox.height - (parentBbox.y + parentBbox.height),
     },
   }),
   SCALE: () => "Scale",
