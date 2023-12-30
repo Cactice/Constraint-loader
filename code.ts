@@ -56,14 +56,11 @@ const recurseChildren = <T>(
 
 const attributeGetter = (component: SceneNode) => {
   let constraints = "constraints" in component && component.constraints;
-  const childConstraints = recurseChildren(component, (child) => {
-    if (!("constraints" in child)) {
-      return {};
+  recurseChildren(component, (child) => {
+    if ("constraints" in child) {
+      constraints = child.constraints;
     }
-    constraints = child.constraints;
-    return {
-      [child.name]: constraints,
-    };
+    return {};
   });
 
   const bbox =
@@ -89,7 +86,7 @@ if (figma.editorType === "figma") {
   const json = figma.currentPage.selection.map((child) =>
     recurseChildren(child, attributeGetter)
   )[0];
-  console.log(JSON.stringify(json));
+  console.log(JSON.stringify(json, null, 2));
 
   // Make sure to close the plugin when you're done. Otherwise the plugin will
   // keep running, which shows the cancel button at the bottom of the screen.
