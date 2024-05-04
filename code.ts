@@ -56,12 +56,14 @@ const recurseChildren = <T>(
 
 const attributeGetter = (component: SceneNode) => {
   let constraints = "constraints" in component && component.constraints;
-  recurseChildren(component, (child) => {
-    if ("constraints" in child) {
-      constraints = child.constraints;
-    }
-    return {};
-  });
+  if (!constraints) {
+    recurseChildren(component, (child) => {
+      if ("constraints" in child) {
+        constraints = child.constraints;
+      }
+      return {};
+    });
+  }
 
   const bbox =
     "absoluteBoundingBox" in component && component.absoluteBoundingBox;
